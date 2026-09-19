@@ -2,8 +2,6 @@ includes: [default.yaml]
 vlm:
   enabled: true
   device: auto
-  allow_cpu: false
 llm:
   enabled: true
   device: auto
-  allow_cpu: false

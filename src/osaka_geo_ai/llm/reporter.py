@@ -40,9 +40,7 @@ class HuggingFaceReporter:
             ) from exc
         settings = self.settings
         try:
-            device = resolve_device(
-                torch, settings["device"], allow_cpu=settings.get("allow_cpu", False)
-            )
+            device = resolve_device(torch, settings["device"])
         except (RuntimeError, ValueError) as exc:
             raise ProviderUnavailable(f"LLM: {exc}") from exc
         model = None

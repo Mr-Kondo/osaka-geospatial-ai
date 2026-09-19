@@ -8,15 +8,13 @@ def mps_available(torch) -> bool:
     return bool(backend is not None and backend.is_available())
 
 
-def resolve_device(torch, requested: str, *, allow_cpu: bool = False) -> str:
+def resolve_device(torch, requested: str) -> str:
     requested = requested.lower()
     if requested == "auto":
         if torch.cuda.is_available():
             return "cuda"
         if mps_available(torch):
             return "mps"
-        if allow_cpu:
-            return "cpu"
         raise RuntimeError("No CUDA or Apple MPS accelerator is available")
     if requested == "cuda" and not torch.cuda.is_available():
         raise RuntimeError("CUDA accelerator is unavailable")

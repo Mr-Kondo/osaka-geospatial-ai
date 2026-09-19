@@ -35,7 +35,6 @@ def test_auto_device_prefers_cuda_then_apple_mps():
 def test_auto_device_does_not_silently_use_cpu():
     with pytest.raises(RuntimeError, match="No CUDA or Apple MPS"):
         resolve_device(fake_torch(), "auto")
-    assert resolve_device(fake_torch(), "auto", allow_cpu=True) == "cpu"
 
 
 def test_mps_uses_half_precision_and_rejects_unavailable_backend():

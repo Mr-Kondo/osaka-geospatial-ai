@@ -150,9 +150,7 @@ def test_colab_notebook_clones_public_repository_and_runs_pipeline():
     notebook = nbformat.read(
         Path(__file__).resolve().parents[1] / "notebooks/colab_demo.ipynb", as_version=4
     )
-    source = "\n".join(
-        cell.source for cell in notebook.cells if cell.cell_type == "code"
-    )
+    source = "\n".join(cell.source for cell in notebook.cells if cell.cell_type == "code")
     assert "https://github.com/Mr-Kondo/osaka-geospatial-ai.git" in source
     assert '"git", "clone"' in source
     assert '"scripts/run_pipeline.py"' in source
@@ -176,8 +174,8 @@ def test_colab_config_enables_huggingface_models_and_online_downloads():
 
 def test_local_ai_config_auto_selects_cuda_or_apple_mps():
     config = load_config(Path(__file__).resolve().parents[1] / "configs/ai.yaml")
-    assert config["vlm"]["device"] == "auto" and not config["vlm"]["allow_cpu"]
-    assert config["llm"]["device"] == "auto" and not config["llm"]["allow_cpu"]
+    assert config["vlm"]["device"] == "auto"
+    assert config["llm"]["device"] == "auto"
 
 
 def test_configuration_summary_is_read_only_presentation_data():

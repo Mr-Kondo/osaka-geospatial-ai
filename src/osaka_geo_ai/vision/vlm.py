@@ -51,9 +51,7 @@ class HuggingFaceVLM:
             ) from exc
         settings = self.settings
         try:
-            device = resolve_device(
-                torch, settings["device"], allow_cpu=settings.get("allow_cpu", False)
-            )
+            device = resolve_device(torch, settings["device"])
         except (RuntimeError, ValueError) as exc:
             raise ProviderUnavailable(f"VLM: {exc}") from exc
         if device == "cuda":
