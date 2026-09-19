@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "osaka-geospatial-ai"
+version = "0.1.0"
+description = "Artifact-based public GIS, temporal ML and multimodal analysis for Osaka"
+requires-python = ">=3.11,<3.14"
+dynamic = ["dependencies"]
+
+[project.optional-dependencies]
+dev = ["pytest==8.4.2", "ruff==0.13.0", "nbformat==5.10.4", "nbclient==0.10.2", "ipykernel==6.30.1"]
+ai = ["torch==2.8.0", "torchvision==0.23.0", "transformers==4.56.2", "accelerate==1.10.1", "qwen-vl-utils==0.0.14"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E501"]

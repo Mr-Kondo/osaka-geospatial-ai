@@ -1,0 +1,24 @@
+vlm:
+  enabled: false
+  provider: huggingface
+  model: Qwen/Qwen2-VL-2B-Instruct
+  revision: 895c3a49bc3fa70a340399125c650a463535e71c
+  device: cuda
+  min_free_gpu_gb: 8
+  max_pixels: 602112
+  max_new_tokens: 1400
+  images:
+  - land_price_change_map.png
+  - population_change_map.png
+  - railway_map.png
+  - residual_map.png
+llm:
+  enabled: false
+  provider: huggingface
+  model: Qwen/Qwen2.5-1.5B-Instruct
+  revision: 989aa7980e4cf806f80c7fef2b1adb7bc71aa306
+  device: cuda
+  max_new_tokens: 2200
+  base_url: null
+  api_key_env: LLM_API_KEY
+  timeout_seconds: 180

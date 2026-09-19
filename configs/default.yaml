@@ -1,0 +1,29 @@
+includes: [data.yaml, model.yaml, llm.yaml]
+project:
+  region: Osaka Prefecture
+  prefecture_code: '27'
+  seed: 42
+analysis:
+  target_year: 2025
+  first_origin_year: 2021
+  analysis_crs: EPSG:6674
+  output_crs: EPSG:4326
+  station_radius_m: 1000
+  station_merge_m: 200
+  context_buffer_m: 10000
+  landuse_radius_m: 500
+  max_site_movement_m: 50
+paths:
+  raw: data/raw
+  interim: data/interim
+  processed: data/processed
+  artifacts: artifacts
+download:
+  timeout_seconds: 90
+  retries: 3
+  max_archive_mb: 512
+  max_expanded_mb: 2048
+maps:
+  dpi: 150
+  point_size: 10
+  tiles: null

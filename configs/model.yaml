@@ -1,0 +1,29 @@
+model:
+  target: next_year_land_price_change_rate
+  selection_metric: mae
+  validation_target_year: 2024
+  test_target_year: 2025
+  rolling_target_years: [2023, 2024, 2025]
+  numeric_features:
+    - year
+    - latitude
+    - longitude
+    - land_price
+    - area_m2
+    - land_price_change_rate
+    - previous_land_price
+    - previous_land_price_change
+    - population_500m_2010
+    - population_projected_2020
+    - population_projected_change_rate_2010_2020
+    - elderly_ratio_projected_2020
+    - nearest_station_distance_m
+    - station_count_1km
+    - built_up_ratio
+    - forest_ratio
+    - agricultural_ratio
+    - water_ratio
+  categorical_features: [use_code, zoning_code]
+  ridge: {alpha: 10.0}
+  random_forest: {n_estimators: 160, max_depth: 12, min_samples_leaf: 5, n_jobs: 2}
+  lightgbm: {n_estimators: 180, learning_rate: 0.035, num_leaves: 15, min_child_samples: 30, verbosity: -1, n_jobs: 2, deterministic: true, force_col_wise: true}

@@ -1,0 +1,231 @@
+datasets:
+  land_price:
+    source: https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-L01-2025.html
+    license: CC BY 4.0 (2019 onwards)
+    years:
+    - 2019
+    - 2020
+    - 2021
+    - 2022
+    - 2023
+    - 2024
+    - 2025
+    enabled: true
+    files:
+    - year: 2019
+      filename: L01-19_27_GML.zip
+      url: https://nlftp.mlit.go.jp/ksj/gml/data/L01/L01-19/L01-19_27_GML.zip
+      member: '*.shp'
+      columns:
+        municipality_code: L01_021
+        municipality_name: L01_022
+        use_code: L01_001
+        sequence: L01_002
+        previous_use_code: L01_003
+        previous_sequence: L01_004
+        year: L01_005
+        land_price: L01_006
+        selection: L01_007
+        area_m2: L01_024
+        zoning_code: L01_047
+      source: https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-L01-2019.html
+      sha256: d79adb3e50d1c47400abed4312c9b4c6861052818eace89e44ae86e859cd0e8b
+    - year: 2020
+      filename: L01-20_27_GML.zip
+      url: https://nlftp.mlit.go.jp/ksj/gml/data/L01/L01-20/L01-20_27_GML.zip
+      member: '*.shp'
+      columns:
+        municipality_code: L01_021
+        municipality_name: L01_022
+        use_code: L01_001
+        sequence: L01_002
+        previous_use_code: L01_003
+        previous_sequence: L01_004
+        year: L01_005
+        land_price: L01_006
+        selection: L01_007
+        area_m2: L01_024
+        zoning_code: L01_047
+      source: https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-L01-2020.html
+      sha256: cbbece2f2d0c909b5f0df910bda57cfa4d5cd390678ac8021108581cce43ff40
+    - year: 2021
+      filename: L01-21_27_GML.zip
+      url: https://nlftp.mlit.go.jp/ksj/gml/data/L01/L01-21/L01-21_27_GML.zip
+      member: '*.shp'
+      columns:
+        municipality_code: L01_021
+        municipality_name: L01_022
+        use_code: L01_001
+        sequence: L01_002
+        previous_use_code: L01_003
+        previous_sequence: L01_004
+        year: L01_005
+        land_price: L01_006
+        selection: L01_007
+        area_m2: L01_024
+        zoning_code: L01_047
+      source: https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-L01-2021.html
+      sha256: 711d563c111d266989c24847fc15d664e8e6515b5452d3faa6b4a6d4113d8f97
+    - year: 2022
+      filename: L01-22_27_GML.zip
+      url: https://nlftp.mlit.go.jp/ksj/gml/data/L01/L01-22/L01-22_27_GML.zip
+      member: '*.shp'
+      columns:
+        municipality_code: L01_022
+        municipality_name: L01_023
+        use_code: L01_001
+        sequence: L01_002
+        previous_use_code: L01_003
+        previous_sequence: L01_004
+        year: L01_005
+        land_price: L01_006
+        selection: L01_008
+        area_m2: L01_026
+        zoning_code: L01_050
+      source: https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-L01-2022.html
+      sha256: 4d6fb89303e4243ed452674465f61e97d363dbc4a1e83a481978f31acb51100f
+    - year: 2023
+      filename: L01-23_27_GML.zip
+      url: https://nlftp.mlit.go.jp/ksj/gml/data/L01/L01-23/L01-23_27_GML.zip
+      member: '*.shp'
+      columns:
+        municipality_code: L01_022
+        municipality_name: L01_023
+        use_code: L01_001
+        sequence: L01_002
+        previous_use_code: L01_003
+        previous_sequence: L01_004
+        year: L01_005
+        land_price: L01_006
+        selection: L01_008
+        area_m2: L01_026
+        zoning_code: L01_050
+      source: https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-L01-2023.html
+      sha256: 127aaf4fd3efdeec80c405a0588c2d2aedfdc308db2c33f83dfd2587f0ebefe3
+    - year: 2024
+      filename: L01-24_27_GML.zip
+      url: https://nlftp.mlit.go.jp/ksj/gml/data/L01/L01-24/L01-24_27_GML.zip
+      member: '*.shp'
+      columns:
+        municipality_code: L01_001
+        municipality_name: L01_024
+        use_code: L01_002
+        sequence: L01_003
+        previous_municipality_code: L01_004
+        previous_use_code: L01_005
+        previous_sequence: L01_006
+        year: L01_007
+        land_price: L01_008
+        selection: L01_010
+        area_m2: L01_027
+        zoning_code: L01_051
+      source: https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-L01-2024.html
+      sha256: d2a0f6665a668e32b3724b9a7bd43b443618b7c28689111129c21a9679f44f8e
+    - year: 2025
+      filename: L01-25_27_GML.zip
+      url: https://nlftp.mlit.go.jp/ksj/gml/data/L01/L01-25/L01-25_27_GML.zip
+      member: '*.shp'
+      columns:
+        municipality_code: L01_001
+        municipality_name: L01_024
+        use_code: L01_002
+        sequence: L01_003
+        previous_municipality_code: L01_004
+        previous_use_code: L01_005
+        previous_sequence: L01_006
+        year: L01_007
+        land_price: L01_008
+        selection: L01_010
+        area_m2: L01_027
+        zoning_code: L01_051
+      source: https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-L01-2025.html
+      sha256: beb97bcea8c09be21a3517e80ab498b96e18d574fe862bdb6dcd69a15974df5b
+  population:
+    source: https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-mesh500.html
+    license: CC BY 4.0
+    year: 2017
+    available_from_year: 2019
+    enabled: true
+    files:
+    - filename: m500-17_27_GML.zip
+      url: https://nlftp.mlit.go.jp/ksj/gml/data/m500/m500-17/m500-17_27_GML.zip
+      member: '*.shp'
+      sha256: d50448b2eaeea70f783bc58cdce649c1ae675b4bd1d1c167e1271029f49243b7
+    columns:
+      mesh_id: MESH_ID
+      municipality_code: CITY_CODE
+      population_500m_2010: POP2010
+      population_projected_2020: POP2020
+      population_projected_2025: POP2025
+      elderly_projected_2020: POP2020C
+  railway:
+    source: https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-N02-v2_3.html
+    license: Open data; source-specific terms and PDL 1.0
+    year: 2020
+    available_from_year: 2021
+    enabled: true
+    files:
+    - filename: N02-20_GML.zip
+      url: https://nlftp.mlit.go.jp/ksj/gml/data/N02/N02-20/N02-20_GML.zip
+      station_member: '*Station.shp'
+      railway_member: '*RailroadSection.shp'
+      sha256: 12fadde339dfbe3088e99dbd53da19447cd7c4bb8ba4af540e2a73c86a0458c7
+  landuse:
+    source: https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-L03-b.html
+    license: Open data (2016); source-specific terms and PDL 1.0
+    year: 2016
+    available_from_year: 2019
+    enabled: true
+    files:
+    - filename: L03-b-16_5134-jgd_GML.zip
+      url: https://nlftp.mlit.go.jp/ksj/gml/data/L03-b/L03-b-16/L03-b-16_5134-jgd_GML.zip
+      member: '*.shp'
+      sha256: c790c39ff5f901f563bc70b73ded3585b380c57ecf688f03bc85c9a6bdeb91fe
+    - filename: L03-b-16_5135-jgd_GML.zip
+      url: https://nlftp.mlit.go.jp/ksj/gml/data/L03-b/L03-b-16/L03-b-16_5135-jgd_GML.zip
+      member: '*.shp'
+      sha256: d55f5916e031277efab71223fc234d00385e096e9e766bac3b2269c0f5c14111
+    - filename: L03-b-16_5234-jgd_GML.zip
+      url: https://nlftp.mlit.go.jp/ksj/gml/data/L03-b/L03-b-16/L03-b-16_5234-jgd_GML.zip
+      member: '*.shp'
+      sha256: 185ee8bb3f99268434d999da4a230997b3daa775e94541dd2b64094453cfe9b7
+    - filename: L03-b-16_5235-jgd_GML.zip
+      url: https://nlftp.mlit.go.jp/ksj/gml/data/L03-b/L03-b-16/L03-b-16_5235-jgd_GML.zip
+      member: '*.shp'
+      sha256: 902f9c682c43cb4952ad55dacc809229766340ab5deb588826f4e1f9dcdc9a01
+    class_column: 土地利用種
+    classes:
+      built_up:
+      - '0700'
+      forest:
+      - '0500'
+      agricultural:
+      - '0100'
+      - '0200'
+      water:
+      - '1100'
+      - '1500'
+    mesh_column: メッシュ
+    class_source: https://nlftp.mlit.go.jp/ksj/gml/codelist/LandUseCd-09.html
+  boundary:
+    source: https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-N03-2024.html
+    license: CC BY 4.0
+    year: 2024
+    enabled: true
+    cartography_only: true
+    files:
+    - filename: N03-20240101_27_GML.zip
+      url: https://nlftp.mlit.go.jp/ksj/gml/data/N03/N03-2024/N03-20240101_27_GML.zip
+      member: '*.shp'
+      sha256: 94289340964ff99adb514a7442009baad9d203d1f0579970e16a7aa356fdf828
+  flood:
+    source: https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-A31-v4_0.html
+    license: Source-specific open data terms; verify river/scenario coverage
+    enabled: false
+    year: 2022
+    available_from_year: 2024
+    manual_path: data/raw/flood/flood.parquet
+    coverage_path: data/raw/flood/coverage.parquet
+    depth_column: flood_depth_m
+    scenario: maximum_assumed
+    files: []
