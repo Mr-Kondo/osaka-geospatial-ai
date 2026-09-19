@@ -66,7 +66,7 @@ On this macOS/Accelerate environment, scikit-learn emitted NumPy `matmul` Runtim
 
 ```text
 pytest -q: 33 passed
-ruff check src scripts tests: passed
+ruff check .: passed
 all 9 scripts --help: exit code 0
 ```
 
@@ -76,7 +76,9 @@ Local AI device selection is also covered: CUDA has priority, Apple MPS is selec
 
 ## Notebook
 
-更新後Notebookはnbformat、全コードセルのAST、Presentation Layer制約、GitHub clone、script呼出し、AI有効設定の契約テストを通過しました（23セル、うちコード11セル）。11コードセルを同一Pythonプロセスで上から順に実行し、pipeline、設定・実行環境表、データ表、HTML地図、PNG、metrics、予測、VLM JSON、report-generation JSON、Markdownレポートの表示まで完了しました。Notebookからのdomain importは読み取り専用の `osaka_geo_ai.presentation` だけです。
+更新後Notebookはnbformat、全コードセルのAST、Presentation Layer制約、GitHub clone、script呼出し、AI有効設定の契約テストを通過しました（24セル、うちコード12セル）。コードセルを同一Pythonプロセスで上から順に実行し、pipeline、設定・実行環境表、データ表、HTML地図、PNG、metrics、予測、VLM JSON、report-generation JSON、Markdownレポートの表示まで完了しました。Notebookからのdomain importは読み取り専用の `osaka_geo_ai.presentation` だけです。
+
+Colab判定はロード済みモジュールに依存せず、`google.colab` の取得可否で行います。editable install直後のカーネルでもimportできるよう、cloneしたrepositoryの `src/` を明示的にimport pathへ登録します。ローカル環境ではセットアップからPresentation adapterのimportまでを新しいPythonプロセスで再実行し、成功を確認しました。
 
 A native Jupyter kernel run could not be performed in the managed sandbox because the kernel manager needs to bind a local communication port. An escalation request was not executed because automatic approval review hit the account usage limit; this was not a safety rejection. Actual Google Colab execution and CUDA inference therefore remain external verification items.
 

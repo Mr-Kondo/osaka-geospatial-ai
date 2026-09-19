@@ -152,6 +152,8 @@ def test_colab_notebook_clones_public_repository_and_runs_pipeline():
     )
     source = "\n".join(cell.source for cell in notebook.cells if cell.cell_type == "code")
     assert "https://github.com/Mr-Kondo/osaka-geospatial-ai.git" in source
+    assert 'find_spec("google") is not None and find_spec("google.colab") is not None' in source
+    assert 'sys.path.insert(0, str(ROOT / "src"))' in source
     assert '"git", "clone"' in source
     assert '"scripts/run_pipeline.py"' in source
     assert '"configs/colab.yaml"' in source
