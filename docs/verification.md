@@ -80,6 +80,8 @@ Local AI device selection is also covered: CUDA has priority, Apple MPS is selec
 
 Colab判定はロード済みモジュールに依存せず、`google.colab` の取得可否で行います。editable install直後のカーネルでもimportできるよう、cloneしたrepositoryの `src/` を明示的にimport pathへ登録します。ローカル環境ではセットアップからPresentation adapterのimportまでを新しいPythonプロセスで再実行し、成功を確認しました。
 
+再実行時のGit更新は、浅いcloneへ `pull --ff-only` せず、浅くfetchした `FETCH_HEAD` を直接checkoutします。一時bare repositoryで旧commitを浅くcloneした後にremoteを更新する条件を再現し、checkout後のcommit SHAが最新remoteと一致することを確認しました。
+
 A native Jupyter kernel run could not be performed in the managed sandbox because the kernel manager needs to bind a local communication port. An escalation request was not executed because automatic approval review hit the account usage limit; this was not a safety rejection. Actual Google Colab execution and CUDA inference therefore remain external verification items.
 
 ## Maps

@@ -155,6 +155,8 @@ def test_colab_notebook_clones_public_repository_and_runs_pipeline():
     assert 'find_spec("google") is not None and find_spec("google.colab") is not None' in source
     assert 'sys.path.insert(0, str(ROOT / "src"))' in source
     assert '"git", "clone"' in source
+    assert '"checkout", "--detach", "FETCH_HEAD"' in source
+    assert '"git", "pull"' not in source
     assert '"scripts/run_pipeline.py"' in source
     assert '"configs/colab.yaml"' in source
     assert "osaka-geospatial-ai.zip" not in source
