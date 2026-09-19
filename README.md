@@ -174,7 +174,7 @@ ruff check src scripts tests
 | 3 | PNG 6種・4面比較、provider抽象化、Pydantic | 無効/失敗/不正JSON/模擬正常応答 |
 | 4 | 数値集計、analysis.json、説明生成 | 統合スキーマと定型Markdown |
 
-学習処理がvalidation/test/rollingの評価も担当します。`run_pipeline.py` は各stageを呼ぶだけです。失敗時のstage・処理秒数も `run_metadata.json` に残します。
+学習処理がvalidation/test/rollingの評価も担当します。`run_pipeline.py` は各stageを呼ぶだけです。Colabとローカルの実行中は `Osaka pipeline` 進捗バーに完了stage数、現在のstage、経過時間、推定残り時間を表示します。既存の詳細ログも進捗バーを崩さず表示し、失敗時のstage・処理秒数は `run_metadata.json` に残します。
 
 ## Artifact Structure
 

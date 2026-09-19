@@ -65,12 +65,14 @@ On this macOS/Accelerate environment, scikit-learn emitted NumPy `matmul` Runtim
 ## Automated tests and checks
 
 ```text
-pytest -q: 35 passed
+pytest -q: 37 passed
 ruff check .: passed
 all 9 scripts --help: exit code 0
 ```
 
-The tests cover required columns, missing/geographic CRS rejection, projected distance, inclusive 1 km station count, deterministic mesh-boundary handling, area-weighted land use, flood coverage unknown vs zero risk, annual-site linking, movement exclusion, missing-year leakage, target-feature leakage, temporal split, four model shapes, metrics, Pydantic output, provider failure, ZIP path traversal, config cycles, stale artifact hashes, and Notebook logic separation.
+The tests cover required columns, missing/geographic CRS rejection, projected distance, inclusive 1 km station count, deterministic mesh-boundary handling, area-weighted land use, flood coverage unknown vs zero risk, annual-site linking, movement exclusion, missing-year leakage, target-feature leakage, temporal split, four model shapes, metrics, Pydantic output, provider failure, ZIP path traversal, config cycles, stale artifact hashes, Notebook logic separation, and pipeline progress output for completion and failure.
+
+`python scripts/run_pipeline.py --config configs/default.yaml --phase 1 --offline` completed against the checksum-verified cache. The terminal showed `download`, `prepare`, and `basic_maps` as a three-stage `Osaka pipeline` progress bar, reached 100%, retained the detailed timestamped logs, and wrote the completed stage timings to `artifacts/run_metadata.json`.
 
 Local AI device selection is also covered: CUDA has priority, Apple MPS is selected when CUDA is absent, and CPU is the final fallback. Notebook code may import only the read-only `osaka_geo_ai.presentation` adapter; configuration resolution and runtime-device display are implemented there. This host did not have the optional PyTorch AI environment installed, so real MPS/CPU model inference remains unverified.
 

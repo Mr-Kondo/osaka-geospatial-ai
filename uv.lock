@@ -1126,6 +1126,7 @@ dependencies = [
     { name = "scikit-learn" },
     { name = "scipy" },
     { name = "shapely" },
+    { name = "tqdm" },
 ]
 
 [package.optional-dependencies]
@@ -1172,6 +1173,7 @@ requires-dist = [
     { name = "shapely", specifier = "==2.1.1" },
     { name = "torch", marker = "extra == 'ai'", specifier = "==2.8.0" },
     { name = "torchvision", marker = "extra == 'ai'", specifier = "==0.23.0" },
+    { name = "tqdm", specifier = "==4.70.1" },
     { name = "transformers", marker = "extra == 'ai'", specifier = "==4.56.2" },
 ]
 provides-extras = ["dev", "ai"]

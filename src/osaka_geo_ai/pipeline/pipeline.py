@@ -10,6 +10,9 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
+from tqdm.auto import tqdm
+from tqdm.contrib.logging import logging_redirect_tqdm
+
 from osaka_geo_ai.config import artifact, directory
 from osaka_geo_ai.io import sha256, write_json
 
@@ -54,39 +57,49 @@ def run_pipeline(config, *, phase=4, offline=False, refresh=False):
         },
         "stages": [],
     }
-    path = artifact(config, "run_metadata.json")
-    write_json(path, metadata)
+    metadata_path = artifact(config, "run_metadata.json")
+    write_json(metadata_path, metadata)
+    progress = tqdm(
+        PHASE_STAGES[phase], desc="Osaka pipeline", unit="stage", dynamic_ncols=True
+    )
     try:
-        for stage in PHASE_STAGES[phase]:
-            LOG.info("Stage: %s", stage)
-            start = time.monotonic()
-            record = {"name": stage, "status": "running"}
-            metadata["stages"].append(record)
-            write_json(path, metadata)
-            result = run_stage(
-                stage,
-                config,
-                **({"offline": offline, "refresh": refresh} if stage == "download" else {}),
-            )
-            record.update(
-                status="completed",
-                elapsed_seconds=round(time.monotonic() - start, 3),
-                artifact=str(result.relative_to(root)),
-                sha256=sha256(result),
-            )
-            write_json(path, metadata)
+        with logging_redirect_tqdm():
+            for stage in progress:
+                progress.set_postfix_str(stage)
+                LOG.info("Stage: %s", stage)
+                stage_started_at = time.monotonic()
+                stage_record = {"name": stage, "status": "running"}
+                metadata["stages"].append(stage_record)
+                write_json(metadata_path, metadata)
+                stage_artifact = run_stage(
+                    stage,
+                    config,
+                    **({"offline": offline, "refresh": refresh} if stage == "download" else {}),
+                )
+                stage_record.update(
+                    status="completed",
+                    elapsed_seconds=round(time.monotonic() - stage_started_at, 3),
+                    artifact=str(stage_artifact.relative_to(root)),
+                    sha256=sha256(stage_artifact),
+                )
+                progress.set_postfix_str(f"{stage}: {stage_record['elapsed_seconds']:.1f}s")
+                write_json(metadata_path, metadata)
         metadata["status"] = "completed"
     except Exception as exc:
         metadata["status"] = "failed"
         metadata["error"] = f"{type(exc).__name__}: {exc}"
         if metadata["stages"]:
-            metadata["stages"][-1]["status"] = "failed"
+            metadata["stages"][-1].update(
+                status="failed", elapsed_seconds=round(time.monotonic() - stage_started_at, 3)
+            )
+            progress.write(f"Osaka pipeline failed: {stage}", file=progress.fp)
         raise
     finally:
+        progress.close()
         metadata["finished_at"] = datetime.now(timezone.utc).isoformat()
         manifest = directory(config, "raw") / "manifest.json"
         if manifest.exists():
             metadata["download_manifest_sha256"] = sha256(manifest)
-        write_json(path, metadata)
+        write_json(metadata_path, metadata)
     LOG.info("Pipeline complete: %s", artifact(config, "reports/report.md"))
-    return path
+    return metadata_path
