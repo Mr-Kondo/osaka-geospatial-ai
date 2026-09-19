@@ -14,4 +14,3 @@ artifacts/**
 !artifacts/**/
 !artifacts/**/.gitkeep
 .DS_Store
-configs/colab_runtime.yaml

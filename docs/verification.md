@@ -8,6 +8,8 @@
 
 `configs/colab.yaml` は別経路としてVLM/LLMを有効化し、公式GISデータとHugging Faceモデルのオンライン自動取得を指定します。
 
+標準利用経路はGoogle Colabです。ローカル実行は公開GitHubリポジトリをcloneした利用者向けの任意経路として文書化しています（ADR-009）。
+
 ## End-to-end pipeline
 
 Command:
@@ -88,7 +90,3 @@ The generated static maps were visually inspected. The four-panel comparison use
 - Real Qwen2-VL/Qwen2.5 LLM model loading and inference were not executed because this host has no configured CUDA runtime and the optional AI packages were not installed.
 - `configs/colab.yaml` is supplied for Colab GPU execution. It enables online Hugging Face downloads and pins model revisions.
 - `python scripts/run_pipeline.py --config configs/colab.yaml` completed locally using the verified public-data cache. As designed for a non-CUDA host without AI extras, VLM/LLM recorded `unavailable` and the numerical pipeline plus deterministic report completed. Real model download/inference remains a Colab GPU verification item.
-
-## Distribution
-
-`artifacts/distribution/osaka-geospatial-ai.zip` contains source, configs, ADRs, tests, requirements, lockfile, and the presentation-only Notebook under a top-level `osaka-geospatial-ai/` directory. It excludes raw data, generated artifacts, the virtual environment, caches, credentials, and model weights. The Notebook downloads official data on its first Colab run.

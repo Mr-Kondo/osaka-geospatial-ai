@@ -6,11 +6,9 @@
 
 大阪府の公的GISデータを取得し、地価地点ごとの特徴量、翌年の地価変化率予測、地図、構造化JSON、日本語レポートを生成するPoCです。標準設定は**2019〜2025年の実データ**を使用します。合成データによる代替は行いません。
 
-```bash
-python scripts/run_pipeline.py --config configs/default.yaml
-```
+**標準の実行環境はGoogle Colabです。** 上の **Open in Colab** からNotebookを開き、T4 GPUを選んで全セルを実行してください。NotebookがGitHubのコード、公式GISデータ、Hugging Faceモデルを自動取得します。
 
-GIS・MLはCPUで実行できます。ローカル標準設定ではVLM/LLMを無効にし、状態付きJSONと定型レポートを生成します。Colab用設定 `configs/colab.yaml` はHugging Face VLM/LLMを有効にし、初回実行時にモデルを自動取得します。
+ローカル実行は任意です。必要な場合はこのGitHubリポジトリをcloneしてから実行します。ローカル標準設定ではGIS・MLをCPUで実行し、VLM/LLMを無効にします。ローカルGPUでAIも実行する場合は `configs/ai.yaml` を使用できます。
 
 ## Architecture
 
@@ -83,26 +81,9 @@ Notebook内にはGIS読込・空間結合・学習・特徴量計算を置きま
 
 重複浸水ポリゴンは最大深度を採用。調査範囲外はnull、調査範囲内で該当なしのみ0です。実際の洪水データを使った検証は未実施です。
 
-## Setup
-
-Python 3.11〜3.13（検証は3.12）。OSのPythonへ直接インストールせず仮想環境を使用します。
-
-```bash
-python3.12 -m venv .venv
-source .venv/bin/activate
-python -m pip install -e '.[dev]'
-```
-
-`uv`を使用する場合は全依存を固定したロックファイルを使えます。
-
-```bash
-uv sync --frozen --extra dev
-uv run python scripts/run_pipeline.py --config configs/default.yaml
-```
-
-macOSでLightGBMが`libomp.dylib`不足と報告した場合は `brew install libomp` が必要です。ColabのLinuxでは通常不要です。APIキーは不要です。任意の外部LLMには `.env.example` の環境変数をシェルまたはColab Secretsから渡します。`.env` の自動読込はしません。
-
 ## Google Colab Usage
+
+これが標準の実行方法です。
 
 1. 上の **Open in Colab** バッジ、または [`notebooks/colab_demo.ipynb`](notebooks/colab_demo.ipynb) をColabで開く。
 2. `ランタイム` → `ランタイムのタイプを変更` → `T4 GPU` を選ぶ。
@@ -119,7 +100,31 @@ Notebookは次を自動実行します。
 
 手動ZIP、APIキー、Notebook内のGIS/MLコードは不要です。データ約69 MiBに加えてモデル重みを取得します。同一Colabセッション内では `/content/huggingface` と `data/raw` のキャッシュを再利用します。セッションを破棄すると再取得が必要です。GPUがない場合は曖昧にCPUへ切り替えず、セットアップセルで停止して設定方法を表示します。
 
+## Local Setup（任意）
+
+ローカルで動かす場合だけ、公開GitHubリポジトリをcloneします。Python 3.11〜3.13（検証は3.12）を使用し、OSのPythonへ直接インストールせず仮想環境を作成します。
+
+```bash
+git clone https://github.com/Mr-Kondo/osaka-geospatial-ai.git
+cd osaka-geospatial-ai
+python3.12 -m venv .venv
+source .venv/bin/activate
+python -m pip install -e '.[dev]'
+python scripts/run_pipeline.py --config configs/default.yaml
+```
+
+`uv`を使用する場合は全依存を固定したロックファイルを使えます。
+
+```bash
+uv sync --frozen --extra dev
+uv run python scripts/run_pipeline.py --config configs/default.yaml
+```
+
+macOSでLightGBMが`libomp.dylib`不足と報告した場合は `brew install libomp` が必要です。ColabのLinuxでは通常不要です。APIキーは不要です。任意の外部LLMには `.env.example` の環境変数をシェルまたはColab Secretsから渡します。`.env` の自動読込はしません。
+
 ## Local Usage
+
+この節はGitHubからclone済みのローカル環境向けです。通常のColab利用では実行不要です。
 
 ```bash
 python scripts/run_pipeline.py --config configs/default.yaml
@@ -128,6 +133,7 @@ python scripts/run_pipeline.py --refresh
 python scripts/run_pipeline.py --phase 1  # 取得・前処理・基本地図まで
 python scripts/run_pipeline.py --phase 2  # ML・残差地図まで
 python scripts/run_pipeline.py --phase 3  # VLM段階まで
+python scripts/run_pipeline.py --config configs/ai.yaml  # ローカルCUDAでAIも実行
 ```
 
 個別実行（各コマンドに `--help`, `--config`, `--log-level` あり）:
