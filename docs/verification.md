@@ -65,7 +65,7 @@ On this macOS/Accelerate environment, scikit-learn emitted NumPy `matmul` Runtim
 ## Automated tests and checks
 
 ```text
-pytest -q: 33 passed
+pytest -q: 34 passed
 ruff check .: passed
 all 9 scripts --help: exit code 0
 ```
@@ -92,7 +92,7 @@ The generated static maps were visually inspected. The four-panel comparison use
 
 - Default run status: `vlm.status = disabled`, with empty findings and an explicit limitation.
 - Default report mode: deterministic template based on `analysis.json`.
-- Mock provider tests verified successful structured output, invalid free prose, invalid confidence, unavailable provider, inference failure, and empty-findings behavior.
-- Real Qwen2-VL/Qwen2.5 LLM model loading and inference were not executed because this host has no configured CUDA runtime and the optional AI packages were not installed.
+- Mock provider tests verified successful structured output, optional cross-map confidence, invalid confidence, invalid free prose, unavailable provider, inference failure, and empty-findings behavior.
+- Real Qwen2-VL/Qwen2.5 LLM model loading and inference were not executed because the optional AI packages were not installed on this host.
 - `configs/colab.yaml` enables online Hugging Face downloads, pins model revisions, and selects CUDA, MPS, or CPU at runtime. Notebook metadata requests a GPU, but Colab allocation remains subject to availability.
 - `python scripts/run_pipeline.py --config configs/colab.yaml` completed locally using the verified public-data cache. This host lacked the optional AI packages, so VLM/LLM recorded `unavailable` and the numerical pipeline plus deterministic report completed. Real model download/inference remains a Colab verification item.

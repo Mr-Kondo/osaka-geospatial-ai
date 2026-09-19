@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -11,17 +11,22 @@ class StrictModel(BaseModel):
     model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
 
 
+Confidence = Annotated[
+    float,
+    Field(ge=0, le=1, description="Model self-assessment, not a calibrated probability"),
+]
+
+
 class VisualPattern(StrictModel):
     region: str = Field(min_length=1)
     observation: str = Field(min_length=1)
-    confidence: float = Field(
-        ge=0, le=1, description="Model self-assessment, not a calibrated probability"
-    )
+    confidence: Confidence
 
 
 class CrossMapRelationship(StrictModel):
     maps: list[str] = Field(min_length=2)
     observation: str = Field(min_length=1)
+    confidence: Confidence | None = None
 
 
 class VisualFindings(StrictModel):

@@ -10,7 +10,7 @@ from pydantic import ValidationError
 from osaka_geo_ai.config import artifact, load_config
 from osaka_geo_ai.data.downloader import validate_archive
 from osaka_geo_ai.io import read_json, write_json
-from osaka_geo_ai.llm.schemas import VisualPattern, VLMAnalysis
+from osaka_geo_ai.llm.schemas import CrossMapRelationship, VisualPattern, VLMAnalysis
 from osaka_geo_ai.models.predict import validate_prediction_contract
 from osaka_geo_ai.presentation import configuration_summary
 from osaka_geo_ai.vision.vlm import ProviderUnavailable, analyze_maps, parse_findings
@@ -22,6 +22,14 @@ def test_structured_output_rejects_confidence_outside_range_and_nan():
             VisualPattern(region="north", observation="cluster", confidence=value)
     with pytest.raises(ValidationError):
         VisualPattern(region="north", observation="cluster", confidence=0.5, unknown=True)
+
+
+def test_cross_map_relationship_accepts_optional_valid_confidence():
+    relationship = {"maps": ["first.png", "second.png"], "observation": "same cluster"}
+    assert CrossMapRelationship(**relationship).confidence is None
+    assert CrossMapRelationship(**relationship, confidence=0.95).confidence == 0.95
+    with pytest.raises(ValidationError):
+        CrossMapRelationship(**relationship, confidence=1.1)
 
 
 def test_disabled_vlm_cannot_claim_findings():
@@ -87,13 +95,20 @@ def test_provider_result_validated_and_images_hashed(isolated_config):
                         {"region": "north", "observation": "red concentration", "confidence": 0.4}
                     ],
                     "anomalies": [],
-                    "cross_map_relationships": [],
+                    "cross_map_relationships": [
+                        {
+                            "maps": c["vlm"]["images"][:2],
+                            "observation": "same visible cluster",
+                            "confidence": 0.95,
+                        }
+                    ],
                     "limitations": ["test double"],
                 }
             )
 
     result = read_json(analyze_maps(c, Provider()))
     assert result["status"] == "completed" and len(result["input_images"][0]["sha256"]) == 64
+    assert result["cross_map_relationships"][0]["confidence"] == 0.95
 
 
 def test_zip_slip_rejected(tmp_path):

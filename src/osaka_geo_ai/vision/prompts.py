@@ -16,6 +16,7 @@ The population map is a 2017-vintage projection of 2010-to-2020 change, NOT obse
 Railway data is a historical snapshot. Land prices and residuals refer to the years printed on their maps.
 Positive residual means actual change exceeded prediction. Negative residual means overprediction.
 Map scales can differ. Note coverage gaps, occlusion, differing time periods and any uncertainty.
+Confidence is required for visual patterns and anomalies, and optional for cross-map relationships.
 Confidence is your subjective confidence, not a statistical probability. Empty arrays are allowed.
 Cross-map 'maps' must use the exact filenames supplied with the images.
 Schema:\n"""
