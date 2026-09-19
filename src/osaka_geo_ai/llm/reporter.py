@@ -10,6 +10,7 @@ from typing import Protocol
 
 import requests
 
+from osaka_geo_ai.accelerator import clear_device_cache, inference_dtype, resolve_device
 from osaka_geo_ai.config import artifact
 from osaka_geo_ai.io import read_json, sha256, write_json
 from osaka_geo_ai.llm.integration import integrate
@@ -29,6 +30,7 @@ class HuggingFaceReporter:
         self.settings = settings
 
     def generate(self, analysis):
+        os.environ.setdefault("PYTORCH_ENABLE_MPS_FALLBACK", "1")
         try:
             import torch
             from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -37,16 +39,20 @@ class HuggingFaceReporter:
                 "Install optional AI dependencies: pip install -e '.[ai]'"
             ) from exc
         settings = self.settings
-        device = settings["device"]
-        if device == "cuda" and not torch.cuda.is_available():
-            raise ProviderUnavailable("LLM: CUDA GPU unavailable")
+        try:
+            device = resolve_device(
+                torch, settings["device"], allow_cpu=settings.get("allow_cpu", False)
+            )
+        except (RuntimeError, ValueError) as exc:
+            raise ProviderUnavailable(f"LLM: {exc}") from exc
         model = None
         try:
             torch.manual_seed(settings.get("seed", 42))
             LOG.info(
-                "Downloading/loading Hugging Face LLM %s at revision %s",
+                "Downloading/loading Hugging Face LLM %s at revision %s on %s",
                 settings["model"],
                 settings["revision"],
+                device,
             )
             tokenizer = AutoTokenizer.from_pretrained(
                 settings["model"],
@@ -57,7 +63,7 @@ class HuggingFaceReporter:
             model = AutoModelForCausalLM.from_pretrained(
                 settings["model"],
                 revision=settings["revision"],
-                torch_dtype=torch.float16 if device == "cuda" else torch.float32,
+                torch_dtype=inference_dtype(torch, device),
                 device_map=device,
                 local_files_only=settings.get("local_files_only", False),
                 trust_remote_code=False,
@@ -81,8 +87,7 @@ class HuggingFaceReporter:
         finally:
             del model
             gc.collect()
-            if torch.cuda.is_available():
-                torch.cuda.empty_cache()
+            clear_device_cache(torch, device)
 
 
 class OpenAICompatibleReporter:

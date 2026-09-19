@@ -5,9 +5,11 @@ from __future__ import annotations
 import gc
 import json
 import logging
+import os
 from pathlib import Path
 from typing import Protocol
 
+from osaka_geo_ai.accelerator import clear_device_cache, inference_dtype, resolve_device
 from osaka_geo_ai.config import artifact
 from osaka_geo_ai.io import read_json, sha256, write_json
 from osaka_geo_ai.llm.schemas import VisualFindings, VLMAnalysis
@@ -38,6 +40,7 @@ class HuggingFaceVLM:
         self.settings = settings
 
     def analyze(self, images, prompt):
+        os.environ.setdefault("PYTORCH_ENABLE_MPS_FALLBACK", "1")
         try:
             import torch
             from PIL import Image
@@ -47,23 +50,27 @@ class HuggingFaceVLM:
                 "Install optional AI dependencies: pip install -e '.[ai]'"
             ) from exc
         settings = self.settings
-        device = settings["device"]
+        try:
+            device = resolve_device(
+                torch, settings["device"], allow_cpu=settings.get("allow_cpu", False)
+            )
+        except (RuntimeError, ValueError) as exc:
+            raise ProviderUnavailable(f"VLM: {exc}") from exc
         if device == "cuda":
-            if not torch.cuda.is_available():
-                raise ProviderUnavailable("CUDA GPU unavailable; select a Colab GPU runtime")
             free, _ = torch.cuda.mem_get_info()
             if free / 1024**3 < settings["min_free_gpu_gb"]:
                 raise ProviderUnavailable(
                     "Insufficient free GPU memory; lower image max_pixels or choose a smaller model"
                 )
         torch.manual_seed(settings.get("seed", 42))
-        dtype = torch.float16 if device == "cuda" else torch.float32
+        dtype = inference_dtype(torch, device)
         model = None
         try:
             LOG.info(
-                "Downloading/loading Hugging Face VLM %s at revision %s",
+                "Downloading/loading Hugging Face VLM %s at revision %s on %s",
                 settings["model"],
                 settings["revision"],
+                device,
             )
             model = AutoModelForImageTextToText.from_pretrained(
                 settings["model"],
@@ -106,8 +113,7 @@ class HuggingFaceVLM:
         finally:
             del model
             gc.collect()
-            if torch.cuda.is_available():
-                torch.cuda.empty_cache()
+            clear_device_cache(torch, device)
 
 
 def analyze_maps(config, provider: VLMProvider | None = None):

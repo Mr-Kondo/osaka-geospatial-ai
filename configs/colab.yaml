@@ -12,10 +12,12 @@ vlm:
   enabled: true
   provider: huggingface
   device: cuda
+  allow_cpu: false
   local_files_only: false
 
 llm:
   enabled: true
   provider: huggingface
   device: cuda
+  allow_cpu: false
   local_files_only: false

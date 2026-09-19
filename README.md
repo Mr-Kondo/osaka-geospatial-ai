@@ -8,7 +8,7 @@
 
 **標準の実行環境はGoogle Colabです。** 上の **Open in Colab** からNotebookを開き、T4 GPUを選んで全セルを実行してください。NotebookがGitHubのコード、公式GISデータ、Hugging Faceモデルを自動取得します。
 
-ローカル実行は任意です。必要な場合はこのGitHubリポジトリをcloneしてから実行します。ローカル標準設定ではGIS・MLをCPUで実行し、VLM/LLMを無効にします。ローカルGPUでAIも実行する場合は `configs/ai.yaml` を使用できます。
+ローカル実行は任意です。必要な場合はこのGitHubリポジトリをcloneしてから実行します。ローカル標準設定ではGIS・MLをCPUで実行し、VLM/LLMを無効にします。`configs/ai.yaml` はNVIDIA CUDAを優先し、Apple SiliconではPyTorch MPSを自動選択します。
 
 ## Architecture
 
@@ -122,6 +122,15 @@ uv run python scripts/run_pipeline.py --config configs/default.yaml
 
 macOSでLightGBMが`libomp.dylib`不足と報告した場合は `brew install libomp` が必要です。ColabのLinuxでは通常不要です。APIキーは不要です。任意の外部LLMには `.env.example` の環境変数をシェルまたはColab Secretsから渡します。`.env` の自動読込はしません。
 
+Apple Silicon MPSまたはローカルCUDAでVLM/LLMも動かす場合はAI依存を追加します。
+
+```bash
+python -m pip install -e '.[dev,ai]'
+python scripts/run_pipeline.py --config configs/ai.yaml
+```
+
+`uv`では `uv sync --frozen --extra dev --extra ai` を使用します。
+
 ## Local Usage
 
 この節はGitHubからclone済みのローカル環境向けです。通常のColab利用では実行不要です。
@@ -133,7 +142,7 @@ python scripts/run_pipeline.py --refresh
 python scripts/run_pipeline.py --phase 1  # 取得・前処理・基本地図まで
 python scripts/run_pipeline.py --phase 2  # ML・残差地図まで
 python scripts/run_pipeline.py --phase 3  # VLM段階まで
-python scripts/run_pipeline.py --config configs/ai.yaml  # ローカルCUDAでAIも実行
+python scripts/run_pipeline.py --config configs/ai.yaml  # CUDAまたはApple Silicon MPSでAIも実行
 ```
 
 個別実行（各コマンドに `--help`, `--config`, `--log-level` あり）:
@@ -239,7 +248,7 @@ python scripts/analyze_map_vlm.py --config configs/colab.yaml
 python scripts/generate_report.py --config configs/colab.yaml
 ```
 
-CUDA、空きGPUメモリ8GiB以上を事前検査します。T4 16GB級を想定しますが、実推論メモリは未実測です。4画像、各最大約60万pixel、出力token数を制限します。OOM、依存不足、モデル読込失敗、不正JSONはstatus付きで保存し、GIS/MLを破棄しません。構造検証は観察の意味的正しさを保証しません。confidenceはモデルの自己評価です。
+ColabはCUDAと空きGPUメモリ8GiB以上を事前検査します。ローカルの `configs/ai.yaml` はCUDA、次に[Apple Silicon MPS](https://docs.pytorch.org/docs/stable/notes/mps.html)を選び、どちらもなければAI段階を`unavailable`として数値処理を維持します。MPSの未対応演算には `PYTORCH_ENABLE_MPS_FALLBACK=1` を設定し、必要な演算だけCPUへ戻します。MPSではモデル全体がユニファイドメモリへ収まる必要があります。4画像、各最大約60万pixel、出力token数を制限します。OOM、依存不足、モデル読込失敗、不正JSONはstatus付きで保存し、GIS/MLを破棄しません。構造検証は観察の意味的正しさを保証しません。confidenceはモデルの自己評価です。
 
 ## LLM Responsibility
 

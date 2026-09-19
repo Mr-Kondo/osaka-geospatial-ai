@@ -65,12 +65,14 @@ On this macOS/Accelerate environment, scikit-learn emitted NumPy `matmul` Runtim
 ## Automated tests and checks
 
 ```text
-pytest -q: 28 passed
+pytest -q: 32 passed
 ruff check src scripts tests: passed
 all 9 scripts --help: exit code 0
 ```
 
 The tests cover required columns, missing/geographic CRS rejection, projected distance, inclusive 1 km station count, deterministic mesh-boundary handling, area-weighted land use, flood coverage unknown vs zero risk, annual-site linking, movement exclusion, missing-year leakage, target-feature leakage, temporal split, four model shapes, metrics, Pydantic output, provider failure, ZIP path traversal, config cycles, stale artifact hashes, and Notebook logic separation.
+
+Local AI device selection is also covered: CUDA has priority, Apple MPS is selected when CUDA is absent, and CPU is not used silently. This host did not have the optional PyTorch AI environment installed, so real MPS model inference remains unverified.
 
 ## Notebook
 

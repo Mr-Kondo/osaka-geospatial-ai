@@ -161,3 +161,11 @@ def test_colab_config_enables_huggingface_models_and_online_downloads():
     assert config["datasets"]["land_price"]["enabled"]
     assert config["datasets"]["population"]["enabled"]
     assert config["datasets"]["railway"]["enabled"]
+    assert config["vlm"]["device"] == "cuda"
+    assert config["llm"]["device"] == "cuda"
+
+
+def test_local_ai_config_auto_selects_cuda_or_apple_mps():
+    config = load_config(Path(__file__).resolve().parents[1] / "configs/ai.yaml")
+    assert config["vlm"]["device"] == "auto" and not config["vlm"]["allow_cpu"]
+    assert config["llm"]["device"] == "auto" and not config["llm"]["allow_cpu"]
