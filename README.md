@@ -98,7 +98,7 @@ Notebookは次を自動実行します。
 5. Hugging Face HubからQwen VLMとLLMの固定revisionを取得し、VLM、統合JSON、LLMレポートまで生成。
 6. 地図、表、指標、予測、VLM JSON、最終レポートを表示。
 
-手動ZIP、APIキー、Notebook内のGIS/MLコードは不要です。データ約69 MiBに加えてモデル重みを取得します。同一Colabセッション内では `/content/huggingface` と `data/raw` のキャッシュを再利用します。セッションを破棄すると再取得が必要です。GPUがない場合は曖昧にCPUへ切り替えず、セットアップセルで停止して設定方法を表示します。
+手動ZIP、APIキー、Notebook内のGIS/ML/AI処理コードは不要です。データ約69 MiBに加えてモデル重みを取得します。同一Colabセッション内では `/content/huggingface` と `data/raw` のキャッシュを再利用します。セッションを破棄すると再取得が必要です。Notebookは実行環境を表示するだけで、GPU利用可否の判断とエラー処理はprovider側が行います。GPUがない場合もGIS・MLまでは完走し、VLM/LLM成果物へ`unavailable`を明記します。
 
 ## Local Setup（任意）
 

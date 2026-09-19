@@ -4,7 +4,42 @@ from pathlib import Path
 
 import pandas as pd
 
+from osaka_geo_ai.config import load_config
 from osaka_geo_ai.io import read_json
+
+
+def configuration_summary(root=Path("."), config_path="configs/default.yaml"):
+    root = Path(root)
+    config = load_config(root / config_path)
+    try:
+        import torch
+
+        if torch.cuda.is_available():
+            runtime = f"CUDA: {torch.cuda.get_device_name(0)}"
+        elif getattr(torch.backends, "mps", None) and torch.backends.mps.is_available():
+            runtime = "Apple MPS"
+        else:
+            runtime = "CPU; AI stages will report unavailable unless CPU is explicitly enabled"
+    except ImportError:
+        runtime = "PyTorch unavailable; install the ai extra"
+    return pd.DataFrame(
+        [
+            {"item": "config", "value": str(Path(config_path))},
+            {"item": "runtime accelerator", "value": runtime},
+            {
+                "item": "VLM",
+                "value": f"{config['vlm']['model']} ({config['vlm']['device']})",
+            },
+            {
+                "item": "LLM",
+                "value": f"{config['llm']['model']} ({config['llm']['device']})",
+            },
+            {
+                "item": "GIS data",
+                "value": "official URLs; automatic download with SHA-256 verification",
+            },
+        ]
+    )
 
 
 def dataset_summary(root=Path(".")):

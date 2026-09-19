@@ -12,6 +12,7 @@ from osaka_geo_ai.data.downloader import validate_archive
 from osaka_geo_ai.io import read_json, write_json
 from osaka_geo_ai.llm.schemas import VisualPattern, VLMAnalysis
 from osaka_geo_ai.models.predict import validate_prediction_contract
+from osaka_geo_ai.presentation import configuration_summary
 from osaka_geo_ai.vision.vlm import ProviderUnavailable, analyze_maps, parse_findings
 
 
@@ -135,6 +136,14 @@ def test_notebook_contains_presentation_only():
             for n in ast.walk(tree)
         )
         assert not any(isinstance(n, ast.Attribute) and n.attr in forbidden for n in ast.walk(tree))
+        domain_imports = [
+            n.module
+            for n in ast.walk(tree)
+            if isinstance(n, ast.ImportFrom)
+            and n.module is not None
+            and n.module.startswith("osaka_geo_ai")
+        ]
+        assert all(module == "osaka_geo_ai.presentation" for module in domain_imports)
 
 
 def test_colab_notebook_clones_public_repository_and_runs_pipeline():
@@ -169,3 +178,11 @@ def test_local_ai_config_auto_selects_cuda_or_apple_mps():
     config = load_config(Path(__file__).resolve().parents[1] / "configs/ai.yaml")
     assert config["vlm"]["device"] == "auto" and not config["vlm"]["allow_cpu"]
     assert config["llm"]["device"] == "auto" and not config["llm"]["allow_cpu"]
+
+
+def test_configuration_summary_is_read_only_presentation_data():
+    root = Path(__file__).resolve().parents[1]
+    summary = configuration_summary(root, "configs/colab.yaml")
+    assert list(summary.columns) == ["item", "value"]
+    assert set(summary["item"]) == {"config", "runtime accelerator", "VLM", "LLM", "GIS data"}
+    assert "Qwen/Qwen2-VL-2B-Instruct" in summary.loc[summary["item"] == "VLM", "value"].item()

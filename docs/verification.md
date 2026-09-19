@@ -65,18 +65,18 @@ On this macOS/Accelerate environment, scikit-learn emitted NumPy `matmul` Runtim
 ## Automated tests and checks
 
 ```text
-pytest -q: 32 passed
+pytest -q: 33 passed
 ruff check src scripts tests: passed
 all 9 scripts --help: exit code 0
 ```
 
 The tests cover required columns, missing/geographic CRS rejection, projected distance, inclusive 1 km station count, deterministic mesh-boundary handling, area-weighted land use, flood coverage unknown vs zero risk, annual-site linking, movement exclusion, missing-year leakage, target-feature leakage, temporal split, four model shapes, metrics, Pydantic output, provider failure, ZIP path traversal, config cycles, stale artifact hashes, and Notebook logic separation.
 
-Local AI device selection is also covered: CUDA has priority, Apple MPS is selected when CUDA is absent, and CPU is not used silently. This host did not have the optional PyTorch AI environment installed, so real MPS model inference remains unverified.
+Local AI device selection is also covered: CUDA has priority, Apple MPS is selected when CUDA is absent, and CPU is not used silently. Notebook code may import only the read-only `osaka_geo_ai.presentation` adapter; configuration resolution and runtime-device display are implemented there. This host did not have the optional PyTorch AI environment installed, so real MPS model inference remains unverified.
 
 ## Notebook
 
-旧NotebookはnbformatとAST検証、および11コードセルのローカル逐次実行を通過しました。2026-09-19のColab自動化変更後は、公開GitHubの固定URLからclone/updateし、`configs/colab.yaml` でオンラインデータ取得とHugging Face VLM/LLMを常時有効化する構成です。更新後Notebookもnbformat、全コードセルのAST、Presentation Layer制約、GitHub clone、script呼出し、AI有効設定の契約テストを通過しました（23セル、うちコード11セル）。
+更新後Notebookはnbformat、全コードセルのAST、Presentation Layer制約、GitHub clone、script呼出し、AI有効設定の契約テストを通過しました（23セル、うちコード11セル）。11コードセルを同一Pythonプロセスで上から順に実行し、pipeline、設定・実行環境表、データ表、HTML地図、PNG、metrics、予測、VLM JSON、report-generation JSON、Markdownレポートの表示まで完了しました。Notebookからのdomain importは読み取り専用の `osaka_geo_ai.presentation` だけです。
 
 A native Jupyter kernel run could not be performed in the managed sandbox because the kernel manager needs to bind a local communication port. An escalation request was not executed because automatic approval review hit the account usage limit; this was not a safety rejection. Actual Google Colab execution and CUDA inference therefore remain external verification items.
 
