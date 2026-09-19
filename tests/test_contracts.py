@@ -135,3 +135,29 @@ def test_notebook_contains_presentation_only():
             for n in ast.walk(tree)
         )
         assert not any(isinstance(n, ast.Attribute) and n.attr in forbidden for n in ast.walk(tree))
+
+
+def test_colab_notebook_clones_public_repository_and_runs_pipeline():
+    notebook = nbformat.read(
+        Path(__file__).resolve().parents[1] / "notebooks/colab_demo.ipynb", as_version=4
+    )
+    source = "\n".join(
+        cell.source for cell in notebook.cells if cell.cell_type == "code"
+    )
+    assert "https://github.com/Mr-Kondo/osaka-geospatial-ai.git" in source
+    assert '"git", "clone"' in source
+    assert '"scripts/run_pipeline.py"' in source
+    assert '"configs/colab.yaml"' in source
+    assert "osaka-geospatial-ai.zip" not in source
+    assert "ENABLE_AI" not in source
+
+
+def test_colab_config_enables_huggingface_models_and_online_downloads():
+    config = load_config(Path(__file__).resolve().parents[1] / "configs/colab.yaml")
+    assert config["vlm"]["enabled"] and config["vlm"]["provider"] == "huggingface"
+    assert config["llm"]["enabled"] and config["llm"]["provider"] == "huggingface"
+    assert not config["vlm"]["local_files_only"]
+    assert not config["llm"]["local_files_only"]
+    assert config["datasets"]["land_price"]["enabled"]
+    assert config["datasets"]["population"]["enabled"]
+    assert config["datasets"]["railway"]["enabled"]

@@ -43,14 +43,23 @@ class HuggingFaceReporter:
         model = None
         try:
             torch.manual_seed(settings.get("seed", 42))
+            LOG.info(
+                "Downloading/loading Hugging Face LLM %s at revision %s",
+                settings["model"],
+                settings["revision"],
+            )
             tokenizer = AutoTokenizer.from_pretrained(
-                settings["model"], revision=settings["revision"], trust_remote_code=False
+                settings["model"],
+                revision=settings["revision"],
+                local_files_only=settings.get("local_files_only", False),
+                trust_remote_code=False,
             )
             model = AutoModelForCausalLM.from_pretrained(
                 settings["model"],
                 revision=settings["revision"],
                 torch_dtype=torch.float16 if device == "cuda" else torch.float32,
                 device_map=device,
+                local_files_only=settings.get("local_files_only", False),
                 trust_remote_code=False,
             )
             messages = [

@@ -1,5 +1,7 @@
 # Osaka Geospatial AI
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Mr-Kondo/osaka-geospatial-ai/blob/main/notebooks/colab_demo.ipynb)
+
 ## Project Overview
 
 大阪府の公的GISデータを取得し、地価地点ごとの特徴量、翌年の地価変化率予測、地図、構造化JSON、日本語レポートを生成するPoCです。標準設定は**2019〜2025年の実データ**を使用します。合成データによる代替は行いません。
@@ -8,7 +10,7 @@
 python scripts/run_pipeline.py --config configs/default.yaml
 ```
 
-GIS・MLはCPUで実行できます。VLM/LLMは標準設定で無効です。その場合も状態を明記したJSONと、計算結果から生成する定型レポートが完成します。実モデルによる説明はGPU用設定で有効化できます。
+GIS・MLはCPUで実行できます。ローカル標準設定ではVLM/LLMを無効にし、状態付きJSONと定型レポートを生成します。Colab用設定 `configs/colab.yaml` はHugging Face VLM/LLMを有効にし、初回実行時にモデルを自動取得します。
 
 ## Architecture
 
@@ -102,12 +104,20 @@ macOSでLightGBMが`libomp.dylib`不足と報告した場合は `brew install li
 
 ## Google Colab Usage
 
-1. `notebooks/colab_demo.ipynb` をColabで開く。
-2. 配布した `artifacts/distribution/osaka-geospatial-ai.zip` を `/content/osaka-geospatial-ai.zip` へアップロード。あるいはNotebookの `REPO_URL` に自分の公開済み/アクセス可能なリポジトリを指定。
-3. 全セルを上から実行。Notebookがclone/展開、install、設定、script実行を行い、地図・表・指標・予測・VLM状態・レポートを表示。
-4. 実モデルを使用する場合はGPUランタイムで `ENABLE_AI = True`。`.[ai]` を追加インストールし、VLMとLLMを順番に実行。
+1. 上の **Open in Colab** バッジ、または [`notebooks/colab_demo.ipynb`](notebooks/colab_demo.ipynb) をColabで開く。
+2. `ランタイム` → `ランタイムのタイプを変更` → `T4 GPU` を選ぶ。
+3. `ランタイム` → `すべてのセルを実行`を選ぶ。
 
-この作業ではGitHub公開をしていません。存在しないclone URLを埋め込まず、ZIPでも初期化できるようにしています。ローカルでのNotebook全セル実行とColab上のGPU実行は別の検証です。
+Notebookは次を自動実行します。
+
+1. 公開GitHubリポジトリ `https://github.com/Mr-Kondo/osaka-geospatial-ai.git` の `main` を `/content/osaka-geospatial-ai` へcloneまたはfast-forward更新。
+2. `pip install -e '.[ai]'` で固定したGIS・ML・AI依存関係を導入。
+3. `configs/data.yaml` の公式URLから国土数値情報ZIPを取得し、サイズ・CRC・SHA-256を検証。
+4. `python scripts/run_pipeline.py --config configs/colab.yaml` を実行。
+5. Hugging Face HubからQwen VLMとLLMの固定revisionを取得し、VLM、統合JSON、LLMレポートまで生成。
+6. 地図、表、指標、予測、VLM JSON、最終レポートを表示。
+
+手動ZIP、APIキー、Notebook内のGIS/MLコードは不要です。データ約69 MiBに加えてモデル重みを取得します。同一Colabセッション内では `/content/huggingface` と `data/raw` のキャッシュを再利用します。セッションを破棄すると再取得が必要です。GPUがない場合は曖昧にCPUへ切り替えず、セットアップセルで停止して設定方法を表示します。
 
 ## Local Usage
 
@@ -215,19 +225,19 @@ Dummy平均、Ridge、Random Forest、LightGBMを比較し、validation MAEで�
 
 静的な `land_price_change_map.png`, `population_change_map.png`, `railway_map.png`, `residual_map.png` を入力します。`vlm_input_overview.png` は同じ範囲の4面比較です。色の集中・例外・視覚的対応だけを観察し、正確な統計や因果関係を生成させません。
 
-`VLMProvider` の実装を交換できます。標準候補はApache 2.0の [Qwen2-VL-2B-Instruct](https://huggingface.co/Qwen/Qwen2-VL-2B-Instruct)。比較候補だったQwen2.5-VL-3Bには研究用途ライセンスがあるため、OSS優先で2Bを採用しました。モデルのrevisionを設定に固定しています。
+`VLMProvider` の実装を交換できます。Colab標準はApache 2.0の [Qwen2-VL-2B-Instruct](https://huggingface.co/Qwen/Qwen2-VL-2B-Instruct)。比較候補だったQwen2.5-VL-3Bには研究用途ライセンスがあるため、OSS優先で2Bを採用しました。モデルのrevisionを設定に固定し、`local_files_only: false` により未キャッシュ時はHugging Face Hubから取得します。
 
 ```bash
 python -m pip install -e '.[ai]'
-python scripts/analyze_map_vlm.py --config configs/ai.yaml
-python scripts/generate_report.py --config configs/ai.yaml
+python scripts/analyze_map_vlm.py --config configs/colab.yaml
+python scripts/generate_report.py --config configs/colab.yaml
 ```
 
 CUDA、空きGPUメモリ8GiB以上を事前検査します。T4 16GB級を想定しますが、実推論メモリは未実測です。4画像、各最大約60万pixel、出力token数を制限します。OOM、依存不足、モデル読込失敗、不正JSONはstatus付きで保存し、GIS/MLを破棄しません。構造検証は観察の意味的正しさを保証しません。confidenceはモデルの自己評価です。
 
 ## LLM Responsibility
 
-`ReportProvider` の主入力はPydantic検証済み `analysis.json` のみ。巨大CSVやGeoDataFrameは渡しません。標準候補はApache 2.0の [Qwen2.5-1.5B-Instruct](https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct)。VLMを解放してから実行します。
+`ReportProvider` の主入力はPydantic検証済み `analysis.json` のみ。巨大CSVやGeoDataFrameは渡しません。Colab標準はApache 2.0の [Qwen2.5-1.5B-Instruct](https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct)。未キャッシュ時はHugging Face Hubから取得し、VLMを解放してから順番に実行します。
 
 観測事実、統計計算、ML予測、VLM観察、解釈、不確実性を区別するpromptを使用します。定型の数値説明を本文に保持し、LLMの文章は「自動生成・内容未検証」の別節に追記します。生成失敗時は定型説明が残り、LLM生成と偽りません。
 

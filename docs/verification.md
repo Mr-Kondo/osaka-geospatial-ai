@@ -6,6 +6,8 @@
 - Default config: `configs/default.yaml`
 - AI execution: disabled by default
 
+`configs/colab.yaml` は別経路としてVLM/LLMを有効化し、公式GISデータとHugging Faceモデルのオンライン自動取得を指定します。
+
 ## End-to-end pipeline
 
 Command:
@@ -61,7 +63,7 @@ On this macOS/Accelerate environment, scikit-learn emitted NumPy `matmul` Runtim
 ## Automated tests and checks
 
 ```text
-pytest -q: 26 passed
+pytest -q: 28 passed
 ruff check src scripts tests: passed
 all 9 scripts --help: exit code 0
 ```
@@ -70,7 +72,7 @@ The tests cover required columns, missing/geographic CRS rejection, projected di
 
 ## Notebook
 
-`notebooks/colab_demo.ipynb` passed nbformat and AST validation. Its 11 code cells were executed sequentially in one Python process from top to bottom. The execution completed Pipeline, dataset table, interactive-map object, three static images, metrics table, prediction preview, VLM JSON, report-generation JSON, and Markdown report display.
+旧NotebookはnbformatとAST検証、および11コードセルのローカル逐次実行を通過しました。2026-09-19のColab自動化変更後は、公開GitHubの固定URLからclone/updateし、`configs/colab.yaml` でオンラインデータ取得とHugging Face VLM/LLMを常時有効化する構成です。更新後Notebookもnbformat、全コードセルのAST、Presentation Layer制約、GitHub clone、script呼出し、AI有効設定の契約テストを通過しました（23セル、うちコード11セル）。
 
 A native Jupyter kernel run could not be performed in the managed sandbox because the kernel manager needs to bind a local communication port. An escalation request was not executed because automatic approval review hit the account usage limit; this was not a safety rejection. Actual Google Colab execution and CUDA inference therefore remain external verification items.
 
@@ -84,7 +86,8 @@ The generated static maps were visually inspected. The four-panel comparison use
 - Default report mode: deterministic template based on `analysis.json`.
 - Mock provider tests verified successful structured output, invalid free prose, invalid confidence, unavailable provider, inference failure, and empty-findings behavior.
 - Real Qwen2-VL/Qwen2.5 LLM model loading and inference were not executed because this host has no configured CUDA runtime and the optional AI packages were not installed.
-- `configs/ai.yaml` is supplied for Colab GPU verification. Model revisions are pinned.
+- `configs/colab.yaml` is supplied for Colab GPU execution. It enables online Hugging Face downloads and pins model revisions.
+- `python scripts/run_pipeline.py --config configs/colab.yaml` completed locally using the verified public-data cache. As designed for a non-CUDA host without AI extras, VLM/LLM recorded `unavailable` and the numerical pipeline plus deterministic report completed. Real model download/inference remains a Colab GPU verification item.
 
 ## Distribution
 

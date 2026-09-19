@@ -60,17 +60,24 @@ class HuggingFaceVLM:
         dtype = torch.float16 if device == "cuda" else torch.float32
         model = None
         try:
+            LOG.info(
+                "Downloading/loading Hugging Face VLM %s at revision %s",
+                settings["model"],
+                settings["revision"],
+            )
             model = AutoModelForImageTextToText.from_pretrained(
                 settings["model"],
                 revision=settings["revision"],
                 torch_dtype=dtype,
                 device_map=device,
+                local_files_only=settings.get("local_files_only", False),
                 trust_remote_code=False,
             )
             processor = AutoProcessor.from_pretrained(
                 settings["model"],
                 revision=settings["revision"],
                 max_pixels=settings["max_pixels"],
+                local_files_only=settings.get("local_files_only", False),
                 trust_remote_code=False,
             )
             content = []

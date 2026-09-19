@@ -1,0 +1,21 @@
+includes: [ai.yaml]
+
+# Colab is an online, disposable runtime. The downloader verifies every public
+# archive against the SHA-256 values in data.yaml and reuses the session cache.
+download:
+  timeout_seconds: 180
+  retries: 5
+
+# Both models are downloaded lazily from Hugging Face Hub on the first run.
+# They run sequentially so a T4-class GPU does not need to hold both at once.
+vlm:
+  enabled: true
+  provider: huggingface
+  device: cuda
+  local_files_only: false
+
+llm:
+  enabled: true
+  provider: huggingface
+  device: cuda
+  local_files_only: false
