@@ -35,6 +35,35 @@ def parse_findings(text: str) -> VisualFindings:
     return VisualFindings.model_validate(json.loads(value))
 
 
+def canonical_map_reference(reference: str, input_names: list[str]) -> str | None:
+    key = "".join(char for char in Path(reference.strip()).stem.casefold() if char.isalnum())
+    for input_name in input_names:
+        input_key = "".join(char for char in Path(input_name).stem.casefold() if char.isalnum())
+        if key == input_key:
+            return input_name
+    return None
+
+
+def reconcile_cross_map_references(
+    findings: VisualFindings, input_names: list[str]
+) -> VisualFindings:
+    accepted, rejected = [], []
+    for relationship in findings.cross_map_relationships:
+        names = [canonical_map_reference(name, input_names) for name in relationship.maps]
+        if None in names or len(set(names)) < 2:
+            rejected.extend(relationship.maps)
+            continue
+        accepted.append(relationship.model_copy(update={"maps": names}))
+    if not rejected:
+        return findings.model_copy(update={"cross_map_relationships": accepted})
+    limitation = "入力地図と照合できない参照を含む地図間関係を除外しました: " + json.dumps(
+        sorted(set(rejected)), ensure_ascii=False
+    )
+    return findings.model_copy(
+        update={"cross_map_relationships": accepted, "limitations": [*findings.limitations, limitation]}
+    )
+
+
 class HuggingFaceVLM:
     def __init__(self, settings):
         self.settings = settings
@@ -141,13 +170,14 @@ def analyze_maps(config, provider: VLMProvider | None = None):
                 provider = HuggingFaceVLM({**settings, "seed": config["project"]["seed"]})
             LOG.info("Analyzing static maps with %s", settings["model"])
             text = provider.analyze(
-                images, map_prompt(read_json(artifact(config, "maps/map_manifest.json")))
+                images,
+                map_prompt(
+                    read_json(artifact(config, "maps/map_manifest.json")), settings["images"]
+                ),
             )
             raw_path.parent.mkdir(parents=True, exist_ok=True)
             raw_path.write_text(text, encoding="utf-8")
-            findings = parse_findings(text)
-            if any(set(r.maps) - set(settings["images"]) for r in findings.cross_map_relationships):
-                raise ValueError("VLM referenced a map outside its input")
+            findings = reconcile_cross_map_references(parse_findings(text), settings["images"])
             payload.update(findings.model_dump())
             payload["status"] = "completed"
         except ProviderUnavailable as exc:

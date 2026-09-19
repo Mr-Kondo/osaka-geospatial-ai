@@ -248,7 +248,7 @@ python scripts/analyze_map_vlm.py --config configs/colab.yaml
 python scripts/generate_report.py --config configs/colab.yaml
 ```
 
-Notebook metadataはColabへGPUを要求しますが、GPU提供はアカウントと空き状況に依存します。`configs/colab.yaml` とローカルの `configs/ai.yaml` はCUDA、次に[Apple Silicon MPS](https://docs.pytorch.org/docs/stable/notes/mps.html)、最後にCPUを選びます。CUDAでは空きGPUメモリ8GiB以上を検査します。CPUでもVLM/LLMは実行できますが、推論時間は長くなります。MPSの未対応演算には `PYTORCH_ENABLE_MPS_FALLBACK=1` を設定し、必要な演算だけCPUへ戻します。MPSではモデル全体がユニファイドメモリへ収まる必要があります。4画像、各最大約60万pixel、出力token数を制限します。OOM、依存不足、モデル読込失敗、不正JSONはstatus付きで保存し、GIS/MLを破棄しません。構造検証は観察の意味的正しさを保証しません。confidenceはモデルの自己評価です。
+Notebook metadataはColabへGPUを要求しますが、GPU提供はアカウントと空き状況に依存します。`configs/colab.yaml` とローカルの `configs/ai.yaml` はCUDA、次に[Apple Silicon MPS](https://docs.pytorch.org/docs/stable/notes/mps.html)、最後にCPUを選びます。CUDAでは空きGPUメモリ8GiB以上を検査します。CPUでもVLM/LLMは実行できますが、推論時間は長くなります。MPSの未対応演算には `PYTORCH_ENABLE_MPS_FALLBACK=1` を設定し、必要な演算だけCPUへ戻します。MPSではモデル全体がユニファイドメモリへ収まる必要があります。4画像、各最大約60万pixel、出力token数を制限します。地図間関係の地図名は入力ファイル名へ正規化し、照合不能な関係だけを除外してlimitationsへ記録します。OOM、依存不足、モデル読込失敗、不正JSONはstatus付きで保存し、GIS/MLを破棄しません。構造検証は観察の意味的正しさを保証しません。confidenceはモデルの自己評価です。
 
 ## LLM Responsibility
 

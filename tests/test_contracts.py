@@ -97,7 +97,7 @@ def test_provider_result_validated_and_images_hashed(isolated_config):
                     "anomalies": [],
                     "cross_map_relationships": [
                         {
-                            "maps": c["vlm"]["images"][:2],
+                            "maps": ["land price change map", "population-change-map"],
                             "observation": "same visible cluster",
                             "confidence": 0.95,
                         }
@@ -109,6 +109,40 @@ def test_provider_result_validated_and_images_hashed(isolated_config):
     result = read_json(analyze_maps(c, Provider()))
     assert result["status"] == "completed" and len(result["input_images"][0]["sha256"]) == 64
     assert result["cross_map_relationships"][0]["confidence"] == 0.95
+    assert result["cross_map_relationships"][0]["maps"] == c["vlm"]["images"][:2]
+
+
+def test_unknown_cross_map_reference_drops_only_that_relationship(isolated_config):
+    c = isolated_config
+    c["vlm"]["enabled"] = True
+    for name in c["vlm"]["images"]:
+        path = artifact(c, "figures/" + name)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(b"fixture")
+    write_json(artifact(c, "maps/map_manifest.json"), {})
+
+    class Provider:
+        def analyze(self, images, prompt):
+            return json.dumps(
+                {
+                    "visual_patterns": [
+                        {"region": "north", "observation": "visible cluster", "confidence": 0.7}
+                    ],
+                    "anomalies": [],
+                    "cross_map_relationships": [
+                        {
+                            "maps": [c["vlm"]["images"][0], "invented_map.png"],
+                            "observation": "unsupported comparison",
+                        }
+                    ],
+                    "limitations": [],
+                }
+            )
+
+    result = read_json(analyze_maps(c, Provider()))
+    assert result["status"] == "completed" and result["visual_patterns"]
+    assert not result["cross_map_relationships"]
+    assert "invented_map.png" in result["limitations"][-1]
 
 
 def test_zip_slip_rejected(tmp_path):
