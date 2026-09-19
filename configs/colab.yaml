@@ -11,11 +11,11 @@ download:
 vlm:
   enabled: true
   provider: huggingface
-  device: cuda
+  device: auto
   local_files_only: false
 
 llm:
   enabled: true
   provider: huggingface
-  device: cuda
+  device: auto
   local_files_only: false

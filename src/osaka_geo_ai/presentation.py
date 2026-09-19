@@ -9,16 +9,15 @@ from osaka_geo_ai.config import load_config
 from osaka_geo_ai.io import read_json
 
 
-def _runtime_accelerator():
+def _runtime_device():
     try:
         import torch
     except ImportError:
         return "PyTorch unavailable; install the ai extra"
-    try:
-        device = resolve_device(torch, "auto")
-    except RuntimeError:
-        return "CPU; AI stages require CUDA or Apple MPS"
-    return f"CUDA: {torch.cuda.get_device_name(0)}" if device == "cuda" else "Apple MPS"
+    device = resolve_device(torch, "auto")
+    if device == "cuda":
+        return f"CUDA: {torch.cuda.get_device_name(0)}"
+    return {"mps": "Apple MPS", "cpu": "CPU"}[device]
 
 
 def configuration_summary(root=Path("."), config_path="configs/default.yaml"):
@@ -26,7 +25,7 @@ def configuration_summary(root=Path("."), config_path="configs/default.yaml"):
     return pd.DataFrame(
         [
             {"item": "config", "value": str(Path(config_path))},
-            {"item": "runtime accelerator", "value": _runtime_accelerator()},
+            {"item": "runtime device", "value": _runtime_device()},
             {"item": "VLM", "value": f"{config['vlm']['model']} ({config['vlm']['device']})"},
             {"item": "LLM", "value": f"{config['llm']['model']} ({config['llm']['device']})"},
             {

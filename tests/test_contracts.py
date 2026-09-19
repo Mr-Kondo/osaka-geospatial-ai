@@ -150,6 +150,7 @@ def test_colab_notebook_clones_public_repository_and_runs_pipeline():
     notebook = nbformat.read(
         Path(__file__).resolve().parents[1] / "notebooks/colab_demo.ipynb", as_version=4
     )
+    assert notebook.metadata["accelerator"] == "GPU"
     source = "\n".join(cell.source for cell in notebook.cells if cell.cell_type == "code")
     assert "https://github.com/Mr-Kondo/osaka-geospatial-ai.git" in source
     assert 'find_spec("google") is not None and find_spec("google.colab") is not None' in source
@@ -172,11 +173,11 @@ def test_colab_config_enables_huggingface_models_and_online_downloads():
     assert config["datasets"]["land_price"]["enabled"]
     assert config["datasets"]["population"]["enabled"]
     assert config["datasets"]["railway"]["enabled"]
-    assert config["vlm"]["device"] == "cuda"
-    assert config["llm"]["device"] == "cuda"
+    assert config["vlm"]["device"] == "auto"
+    assert config["llm"]["device"] == "auto"
 
 
-def test_local_ai_config_auto_selects_cuda_or_apple_mps():
+def test_local_ai_config_uses_automatic_device_selection():
     config = load_config(Path(__file__).resolve().parents[1] / "configs/ai.yaml")
     assert config["vlm"]["device"] == "auto"
     assert config["llm"]["device"] == "auto"
@@ -186,5 +187,5 @@ def test_configuration_summary_is_read_only_presentation_data():
     root = Path(__file__).resolve().parents[1]
     summary = configuration_summary(root, "configs/colab.yaml")
     assert list(summary.columns) == ["item", "value"]
-    assert set(summary["item"]) == {"config", "runtime accelerator", "VLM", "LLM", "GIS data"}
+    assert set(summary["item"]) == {"config", "runtime device", "VLM", "LLM", "GIS data"}
     assert "Qwen/Qwen2-VL-2B-Instruct" in summary.loc[summary["item"] == "VLM", "value"].item()

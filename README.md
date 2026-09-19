@@ -8,7 +8,7 @@
 
 **標準の実行環境はGoogle Colabです。** 上の **Open in Colab** からNotebookを開き、T4 GPUを選んで全セルを実行してください。NotebookがGitHubのコード、公式GISデータ、Hugging Faceモデルを自動取得します。
 
-ローカル実行は任意です。必要な場合はこのGitHubリポジトリをcloneしてから実行します。ローカル標準設定ではGIS・MLをCPUで実行し、VLM/LLMを無効にします。`configs/ai.yaml` はNVIDIA CUDAを優先し、Apple SiliconではPyTorch MPSを自動選択します。
+ローカル実行は任意です。必要な場合はこのGitHubリポジトリをcloneしてから実行します。ローカル標準設定ではGIS・MLをCPUで実行し、VLM/LLMを無効にします。`configs/ai.yaml` はNVIDIA CUDA、Apple SiliconのPyTorch MPS、CPUの順に自動選択します。
 
 ## Architecture
 
@@ -142,7 +142,7 @@ python scripts/run_pipeline.py --refresh
 python scripts/run_pipeline.py --phase 1  # 取得・前処理・基本地図まで
 python scripts/run_pipeline.py --phase 2  # ML・残差地図まで
 python scripts/run_pipeline.py --phase 3  # VLM段階まで
-python scripts/run_pipeline.py --config configs/ai.yaml  # CUDAまたはApple Silicon MPSでAIも実行
+python scripts/run_pipeline.py --config configs/ai.yaml  # CUDA、Apple Silicon MPS、CPUの順でAIも実行
 ```
 
 個別実行（各コマンドに `--help`, `--config`, `--log-level` あり）:
@@ -248,7 +248,7 @@ python scripts/analyze_map_vlm.py --config configs/colab.yaml
 python scripts/generate_report.py --config configs/colab.yaml
 ```
 
-ColabはCUDAと空きGPUメモリ8GiB以上を事前検査します。ローカルの `configs/ai.yaml` はCUDA、次に[Apple Silicon MPS](https://docs.pytorch.org/docs/stable/notes/mps.html)を選び、どちらもなければAI段階を`unavailable`として数値処理を維持します。MPSの未対応演算には `PYTORCH_ENABLE_MPS_FALLBACK=1` を設定し、必要な演算だけCPUへ戻します。MPSではモデル全体がユニファイドメモリへ収まる必要があります。4画像、各最大約60万pixel、出力token数を制限します。OOM、依存不足、モデル読込失敗、不正JSONはstatus付きで保存し、GIS/MLを破棄しません。構造検証は観察の意味的正しさを保証しません。confidenceはモデルの自己評価です。
+Notebook metadataはColabへGPUを要求しますが、GPU提供はアカウントと空き状況に依存します。`configs/colab.yaml` とローカルの `configs/ai.yaml` はCUDA、次に[Apple Silicon MPS](https://docs.pytorch.org/docs/stable/notes/mps.html)、最後にCPUを選びます。CUDAでは空きGPUメモリ8GiB以上を検査します。CPUでもVLM/LLMは実行できますが、推論時間は長くなります。MPSの未対応演算には `PYTORCH_ENABLE_MPS_FALLBACK=1` を設定し、必要な演算だけCPUへ戻します。MPSではモデル全体がユニファイドメモリへ収まる必要があります。4画像、各最大約60万pixel、出力token数を制限します。OOM、依存不足、モデル読込失敗、不正JSONはstatus付きで保存し、GIS/MLを破棄しません。構造検証は観察の意味的正しさを保証しません。confidenceはモデルの自己評価です。
 
 ## LLM Responsibility
 
